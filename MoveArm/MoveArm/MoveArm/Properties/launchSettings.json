@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MoveArm": {
+      "commandName": "Project",
+      "commandLineArgs": "close force"
+    }
+  }
+}

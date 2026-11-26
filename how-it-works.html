@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Silverdome — How It Works</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232733;
+    --border: #2e3345;
+    --text: #d8dae0;
+    --text-dim: #8b90a0;
+    --accent: #6ee7b7;
+    --accent2: #7dd3fc;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --purple: #c4b5fd;
+    --orange: #fb923c;
+    --radius: 12px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+
+  header { text-align: center; margin-bottom: 50px; }
+  header h1 {
+    font-size: 2.6rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+  header p { color: var(--text-dim); font-size: 1.05rem; max-width: 620px; margin: 0 auto; }
+
+  /* ─── Pipeline Flow ─── */
+  .pipeline { display: flex; flex-direction: column; gap: 0; position: relative; }
+
+  .flow-step {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: 0;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp .6s ease forwards;
+  }
+  .flow-step:nth-child(1) { animation-delay: .15s; }
+  .flow-step:nth-child(2) { animation-delay: .45s; }
+  .flow-step:nth-child(3) { animation-delay: .75s; }
+  .flow-step:nth-child(4) { animation-delay: 1.05s; }
+  .flow-step:nth-child(5) { animation-delay: 1.35s; }
+  .flow-step:nth-child(6) { animation-delay: 1.65s; }
+  .flow-step:nth-child(7) { animation-delay: 1.95s; }
+
+  @keyframes fadeUp {
+    to { opacity:1; transform:translateY(0); }
+  }
+
+  /* connector lines */
+  .connector {
+    display: flex; justify-content: center; padding: 4px 0;
+  }
+  .connector svg { width:28px; height:36px; }
+
+  .step-badge {
+    display: inline-block;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+  }
+  .step-badge.capture   { background: rgba(110,231,183,.15); color: var(--accent); }
+  .step-badge.motion     { background: rgba(125,211,252,.15); color: var(--accent2); }
+  .step-badge.inference  { background: rgba(196,181,253,.15); color: var(--purple); }
+  .step-badge.consensus  { background: rgba(251,146,60,.15); color: var(--orange); }
+  .step-badge.decision   { background: rgba(251,191,36,.15); color: var(--warning); }
+  .step-badge.action     { background: rgba(248,113,113,.15); color: var(--danger); }
+  .step-badge.hold       { background: rgba(110,231,183,.15); color: var(--accent); }
+
+  .flow-step h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 6px; }
+  .flow-step p  { color: var(--text-dim); font-size: .95rem; max-width: 700px; }
+
+  /* ─── Diagram inside each step ─── */
+  .diagram {
+    margin-top: 18px;
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex; align-items: center; gap: 16px;
+    flex-wrap: wrap; justify-content: center;
+    overflow: hidden;
+  }
+
+  /* ─── Icon boxes ─── */
+  .icon-box {
+    width: 64px; height: 64px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+  .icon-box.cam     { background: linear-gradient(135deg,#065f46,#0d9488); }
+  .icon-box.diff    { background: linear-gradient(135deg,#1e3a5f,#2563eb); }
+  .icon-box.ai      { background: linear-gradient(135deg,#4c1d95,#7c3aed); }
+  .icon-box.votes   { background: linear-gradient(135deg,#78350f,#ea580c); }
+  .icon-box.arm     { background: linear-gradient(135deg,#7f1d1d,#dc2626); }
+
+  /* ─── Animated camera ─── */
+  .cam-row { display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .cam-body {
+    width:72px; height:52px; border-radius:10px;
+    background: linear-gradient(135deg,#1e293b,#334155);
+    border:2px solid #475569;
+    display:flex; align-items:center; justify-content:center;
+    position:relative; overflow:hidden;
+  }
+  .cam-lens {
+    width:26px;height:26px;border-radius:50%;
+    background: radial-gradient(circle,#38bdf8 0%,#1e3a5f 60%,#0f172a 100%);
+    border:2px solid #475569;
+    position:relative;
+  }
+  .cam-lens::after {
+    content:'';position:absolute;width:8px;height:8px;border-radius:50%;
+    background:rgba(255,255,255,.35);top:4px;left:4px;
+  }
+  .cam-flash {
+    position:absolute;width:100%;height:100%;border-radius:8px;
+    background:radial-gradient(circle at 50% 50%,rgba(110,231,183,.6),transparent 70%);
+    animation: flashAnim 2s ease-in-out infinite;
+  }
+  @keyframes flashAnim { 0%,85%,100%{opacity:0} 92%{opacity:1} 96%{opacity:0} }
+
+  .cam-label { font-size:.7rem;color:var(--text-dim);text-align:center; }
+  .timer-ring {
+    width:36px;height:36px;border-radius:50%;
+    border:3px solid var(--border);border-top-color:var(--accent);
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to{transform:rotate(360deg)} }
+
+  /* ─── Motion diff diagram ─── */
+  .diff-diagram { display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .diff-cell {
+    width:48px;height:48px;border-radius:6px;
+    display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(4,1fr);
+    overflow:hidden; border:1px solid var(--border);
+  }
+  .diff-cell div { background:#1e293b; transition:background .3s; }
+  .diff-cell.changed div:nth-child(5),
+  .diff-cell.changed div:nth-child(10),
+  .diff-cell.changed div:nth-child(14) { background:var(--danger); animation: cellPulse 1.5s ease-in-out infinite; }
+  @keyframes cellPulse { 0%,100%{opacity:.5}50%{opacity:1} }
+
+  .diff-arrow { color:var(--accent2); font-size:24px; animation: arrowBounce 1.2s ease-in-out infinite; }
+  @keyframes arrowBounce { 0%,100%{transform:translateX(0)}50%{transform:translateX(6px)} }
+
+  .diff-label { font-size:.7rem;color:var(--text-dim); text-align:center; }
+
+  /* ─── AI model card ─── */
+  .ai-card {
+    background: linear-gradient(135deg, rgba(76,29,149,.25), rgba(124,58,237,.1));
+    border:1px solid rgba(124,58,237,.3);
+    border-radius:10px; padding:16px 20px; text-align:center; min-width:220px;
+  }
+  .ai-card .model-name { font-weight:700;color:var(--purple);font-size:.95rem;margin-bottom:4px; }
+  .ai-card .model-desc { font-size:.78rem;color:var(--text-dim); }
+
+  /* ─── Consensus voting bar ─── */
+  .vote-row { display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:center; }
+  .vote-chip {
+    width:42px;height:36px;border-radius:6px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.7rem;font-weight:700;
+    border:1px solid var(--border);
+    background:var(--surface);color:var(--text-dim);
+  }
+  .vote-chip.good { background:rgba(110,231,183,.15);color:var(--accent);border-color:rgba(110,231,183,.4); }
+  .vote-chip.bad  { background:rgba(248,113,113,.15);color:var(--danger);border-color:rgba(248,113,113,.4);animation:chipPulse 1.5s ease-in-out infinite; }
+  @keyframes chipPulse { 0%,100%{transform:scale(1)}50%{transform:scale(1.08)} }
+
+  .vote-threshold {
+    margin-left:8px;font-size:.72rem;color:var(--text-dim);
+  }
+  .vote-remaining {
+    font-size:.72rem;color:var(--warning);font-weight:600;margin-left:8px;
+  }
+
+  /* ─── Decision gate ─── */
+  .decision-tree { display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;justify-content:center;margin-top:6px; }
+  .branch {
+    border-radius:8px;padding:12px 18px;font-size:.85rem;
+    min-width:200px;text-align:center;border:1px solid var(--border);
+  }
+  .branch.yes { background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.35);color:var(--danger); }
+  .branch.no  { background:rgba(110,231,183,.08);border-color:rgba(110,231,183,.35);color:var(--accent); }
+
+  /* ─── Arm state diagram ─── */
+  .arm-states { display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center;margin-top:6px; }
+  .state-box {
+    border-radius:8px;padding:12px 20px;text-align:center;font-weight:600;
+    font-size:.9rem;border:2px solid var(--border);min-width:130px;
+  }
+  .state-box.closed  { background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.45);color:var(--danger); }
+  .state-box.waiting { background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.35);color:var(--warning); }
+  .state-box.open    { background:rgba(110,231,183,.1);border-color:rgba(110,231,183,.35);color:var(--accent); }
+
+  /* ─── Release condition mini-flow ─── */
+  .release-flow { display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px; }
+  .rel-step {
+    background:var(--surface2);border-radius:6px;padding:8px 14px;font-size:.78rem;color:var(--text-dim);
+    border:1px solid var(--border);position:relative;
+  }
+  .rel-step.met { border-color:var(--accent);color:var(--accent); }
+  .rel-arrow { color:var(--text-dim);font-size:14px; }
+
+  /* ─── Interactive demo panel ─── */
+  .demo-panel {
+    margin-top:50px;
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);padding:32px;
+  }
+  .demo-panel h2 {
+    font-size:1.3rem;margin-bottom:6px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  }
+  .demo-panel > p { color:var(--text-dim);font-size:.9rem;margin-bottom:20px; }
+
+  .demo-area {
+    background:var(--bg);border-radius:8px;padding:24px;
+    border:1px solid var(--border);min-height:260px;position:relative;
+  }
+
+  .demo-log {
+    font-family:'Cascadia Code','Fira Code',monospace;
+    font-size:.78rem;line-height:1.7;color:var(--text-dim);max-height:220px;overflow-y:auto;
+    padding:4px 0;
+  }
+  .demo-log .line-new      { color:var(--accent2); }
+  .demo-log .line-motion   { color:var(--accent2); }
+  .demo-log .line-inference{ color:var(--purple); }
+  .demo-log .line-good     { color:var(--accent); }
+  .demo-log .line-bad      { color:var(--danger); }
+  .demo-log .line-confirm  { color:var(--warning);font-weight:700; }
+  .demo-log .line-release  { color:var(--accent);font-weight:600; }
+  .demo-log .line-info     { color:var(--text-dim);font-style:italic; }
+
+  .demo-controls { display:flex;gap:10px;margin-top:16px;flex-wrap:wrap; }
+  .demo-btn {
+    padding:8px 18px;border-radius:8px;border:1px solid var(--border);
+    background:var(--surface2);color:var(--text);font-size:.85rem;
+    cursor:pointer;transition:all .15s;
+  }
+  .demo-btn:hover { border-color:var(--accent);background:rgba(110,231,183,.06); }
+  .demo-btn.active { border-color:var(--danger);color:var(--danger);background:rgba(248,113,113,.08); }
+
+  /* ─── Summary box at bottom ─── */
+  .summary-grid {
+    margin-top:50px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;
+  }
+  .summary-card {
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;
+  }
+  .summary-card h4 { font-size:.85rem;color:var(--accent);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em; }
+  .summary-card p  { color:var(--text-dim);font-size:.85rem;line-height:1.55; }
+
+  @media(max-width:700px){
+    header h1{font-size:1.8rem;}
+    .flow-step{padding:20px 18px;}
+    .diagram{padding:14px;}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Silverdome — How It Works</h1>
+    <p>The full detection pipeline: from webcam frame to consensus-driven arm actuation, step by step.</p>
+  </header>
+
+  <!-- ═══════════ STEP 1: Capture ═══════════ -->
+  <div class="pipeline">
+
+    <div class="flow-step" style="border-left:3px solid var(--accent);">
+      <span class="step-badge capture">Step 1 — Capture</span>
+      <h3>📷 Webcam Frame Every Second</h3>
+      <p>The webcam opens once via DirectShow and captures a live frame every ~1 second. Each frame is saved as <code style="color:var(--accent);">temp.jpg</code> in the working directory — a shared file read by MonitorAppweb for the live dashboard snapshot.</p>
+      <div class="diagram">
+        <div class="cam-row">
+          <div class="timer-ring"></div>
+          <div class="cam-label">1 s interval</div>
+        </div>
+        <svg width="40" height="28" viewBox="0 0 40 28"><path d="M6 14 L30 14 M24 8 L30 14 L24 20" stroke="var(--accent)" stroke-width="2.5" fill="none" stroke-linecap="round"/><text x="6" y="10" font-size="9" fill="var(--text-dim)">cam</text></svg>
+        <div class="cam-row">
+          <div class="cam-body"><div class="cam-lens"></div><div class="cam-flash"></div></div>
+          <div class="cam-label">temp.jpg<br>saved to disk</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- connector -->
+    <div class="connector"><svg viewBox="0 0 28 36"><path d="M14 2 L14 28 M8 22 L14 30 L20 22" stroke="var(--border)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+
+    <!-- ═══════════ STEP 2: Motion Detection ═══════════ -->
+    <div class="flow-step" style="border-left:3px solid var(--accent2);">
+      <span class="step-badge motion">Step 2 — Motion Gate</span>
+      <h3>Difference Check (Diff-Gate)</h3>
+      <p>Before calling the AI model, the system compares the current frame against the last "no animal" baseline using pixel-level RGB delta. Only when enough pixels change beyond a threshold (~10%) does it proceed to inference — saving Ollama calls when the scene is static.</p>
+      <div class="diagram">
+        <div style="text-align:center;">
+          <div class="diff-label" style="margin-bottom:4px;">Previous Baseline</div>
+          <div class="diff-cell"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+        </div>
+        <div class="diff-arrow">→</div>
+        <div style="text-align:center;">
+          <div class="diff-label" style="margin-bottom:4px;">Current Frame</div>
+          <div class="diff-cell changed"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+        </div>
+        <div class="diff-arrow">→</div>
+        <div style="text-align:center;">
+          <div class="diff-label" style="margin-bottom:4px;">⚡ Motion &gt; 10% → Inference</div>
+          <div class="diff-cell changed"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- connector -->
+    <div class="connector"><svg viewBox="0 0 28 36"><path d="M14 2 L14 28 M8 22 L14 30 L20 22" stroke="var(--border)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+
+    <!-- ═══════════ STEP 3: AI Inference ═══════════ -->
+    <div class="flow-step" style="border-left:3px solid var(--purple);">
+      <span class="step-badge inference">Step 3 — Vision Inference</span>
+      <h3>qwen2.5vl Fine-Tuned Model Analysis</h3>
+      <p>The frame is resized, base64-encoded, and sent to a local Ollama instance running a fine-tuned qwen2.5vl vision model. The model receives the image plus a structured system prompt asking it to identify any animals on the porch.</p>
+      <div class="diagram">
+        <svg width="160" height="80"><rect x="0" y="24" width="70" height="32" rx="6" fill="var(--surface2)" stroke="var(--border)" stroke-width="1"/><text x="35" y="45" text-anchor="middle" font-size="10" fill="var(--accent2)">Frame JPEG</text><path d="M70 40 L98 40" stroke="var(--purple)" stroke-width="2" stroke-dasharray="4,3"/><polygon points="98,36 106,40 98,44" fill="var(--purple)"/></svg>
+        <div class="ai-card">
+          <div class="model-name">qwen2.5vl (fine-tuned)</div>
+          <div class="model-desc">Local Ollama endpoint<br><code style="color:var(--accent);font-size:.78rem;">http://127.0.0.1:11434/api/chat</code></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- connector -->
+    <div class="connector"><svg viewBox="0 0 28 36"><path d="M14 2 L14 28 M8 22 L14 30 L20 22" stroke="var(--border)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+
+    <!-- ═══════════ STEP 4: Consensus Loop ═══════════ -->
+    <div class="flow-step" style="border-left:3px solid var(--orange);">
+      <span class="step-badge consensus">Step 4 — Consensus Loop</span>
+      <h3>🛡️ Anti-Spam Protection (Consensus Buffer)</h3>
+      <p>A single "bad animal" detection <strong>does not</strong> close the gate — one glitch or false positive is not enough to spook a legitimate cat visitor. The system maintains a rolling vote buffer and requires accumulating <strong>3 consecutive bad-animal votes</strong> before committing to arm closure.</p>
+      <div class="diagram">
+        <div style="text-align:center;margin-bottom:6px;color:var(--text-dim);font-size:.8rem;">Consensus Buffer (rolling window)</div>
+        <div class="vote-row" id="demoVoteRow">
+          <div class="vote-chip good" id="v1">cat</div>
+          <div class="vote-chip good" id="v2">cat</div>
+          <div class="vote-chip good" id="v3">cat</div>
+          <span class="vote-remaining" id="votesRemaining">0 / 3 bad votes needed</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- connector -->
+    <div class="connector"><svg viewBox="0 0 28 36"><path d="M14 2 L14 28 M8 22 L14 30 L20 22" stroke="var(--border)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+
+    <!-- ═══════════ STEP 5: Decision Gate ═══════════ -->
+    <div class="flow-step" style="border-left:3px solid var(--warning);">
+      <span class="step-badge decision">Step 5 — Decision Gate</span>
+      <h3>Confidence Threshold Check</h3>
+      <p>When the buffer reaches 3 consecutive bad-animal votes (equivalent to ~3 seconds of sustained detection), a confirmation event is triggered. If good-animal votes appear before that threshold, the counter resets — protecting legitimate visitors from false closures.</p>
+      <div class="diagram">
+        <div style="text-align:center;">
+          <svg width="280" height="60" viewBox="0 0 280 60">
+            <rect x="95" y="0" width="90" height="30" rx="15" fill="var(--surface2)" stroke="var(--warning)" stroke-width="1.5"/>
+            <text x="140" y="20" text-anchor="middle" font-size="11" fill="var(--warning)">? ≥ 3 bad votes?</text>
+            <!-- yes branch -->
+            <line x1="200" y1="15" x2="248" y2="15" stroke="var(--danger)" stroke-width="1.5"/>
+            <polygon points="248,11 256,15 248,19" fill="var(--danger)"/>
+            <text x="258" y="18" font-size="9" fill="var(--danger)">YES</text>
+            <!-- no branch -->
+            <line x1="140" y1="30" x2="140" y2="50" stroke="var(--accent)" stroke-width="1.5"/>
+            <polygon points="136,50 140,58 144,50" fill="var(--accent)"/>
+            <text x="140" y="52" text-anchor="middle" font-size="9" fill="var(--accent)">NO — keep watching</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- connector -->
+    <div class="connector"><svg viewBox="0 0 28 36"><path d="M14 2 L14 28 M8 22 L14 30 L20 22" stroke="var(--border)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+
+    <!-- ═══════════ STEP 6: Arm Closure ═══════════ -->
+    <div class="flow-step" style="border-left:3px solid var(--danger);">
+      <span class="step-badge action">Step 6 — Arm Closure</span>
+      <h3>🔒 Actuator Command (ticcmd → Pololu TIC500)</h3>
+      <p>Confirmed bad-animal triggers a sequence: energize motor, drive to closed position, wait 15 seconds for mechanical settling, then de-energize. The arm state is persisted to <code style="color:var(--text);">state.txt</code> and an alarm sound plays.</p>
+      <div class="diagram">
+        <div class="arm-states">
+          <div class="state-box open">🟢 Open</div>
+          <svg width="36" height="20"><path d="M4 10 L28 10 M22 5 L28 10 L22 15" stroke="var(--danger)" stroke-width="2" fill="none"/></svg>
+          <div class="state-box closed">🔴 Closed</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- connector -->
+    <div class="connector"><svg viewBox="0 0 28 36"><path d="M14 2 L14 28 M8 22 L14 30 L20 22" stroke="var(--border)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+
+    <!-- ═══════════ STEP 7: Release Conditions ═══════════ -->
+    <div class="flow-step" style="border-left:3px solid var(--accent);">
+      <span class="step-badge hold">Step 7 — Closure Hold &amp; Release</span>
+      <h3>🔑 Double-Guard Release Policy</h3>
+      <p>The gate stays closed even after the animal leaves. It will only reopen when <strong>both</strong> conditions are met simultaneously: (1) no bad-animal detected for 3 consecutive loops (~3 seconds), AND (2) at least 60 seconds have passed since the last bad-animal detection. This prevents rapid close-open-close cycling when an animal lingers.</p>
+      <div class="diagram">
+        <div style="width:100%;max-width:520px;">
+          <div style="font-size:.8rem;color:var(--text-dim);margin-bottom:8px;text-align:center;">Release Conditions (BOTH must be satisfied)</div>
+          <div class="release-flow">
+            <div class="rel-step met" id="rel1">
+              <strong>Condition 1:</strong><br>No bad detection × 3 loops (~3 s)
+            </div>
+            <span style="font-weight:700;color:var(--accent);">&amp;</span>
+            <div class="rel-step met" id="rel2">
+              <strong>Condition 2:</strong><br>≥ 60 s since last bad detection
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /pipeline -->
+
+
+  <!-- ═══════════ INTERACTIVE DEMO ═══════════ -->
+  <div class="demo-panel">
+    <h2>Interactive Demo</h2>
+    <p>Simulate detection events and watch the consensus buffer build toward confirmation. Click buttons to inject frames.</p>
+    <div class="demo-area">
+      <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;">
+        <!-- Left: vote chips display -->
+        <div style="min-width:200px;text-align:center;">
+          <div style="font-size:.78rem;color:var(--text-dim);margin-bottom:6px;">Consensus Buffer</div>
+          <div class="vote-row" id="demoVoteRow2">
+            <div class="vote-chip good">cat</div>
+            <div class="vote-chip good">cat</div>
+            <div class="vote-chip good">cat</div>
+          </div>
+          <div id="armStatus" style="margin-top:14px;font-weight:700;color:var(--accent);font-size:1rem;">State: OPEN ✅</div>
+        </div>
+        <!-- Right: log -->
+        <div style="flex:1;min-width:280px;">
+          <div class="demo-log" id="demoLog">
+            <div class="line-info">// click a button above to simulate frames...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="demo-controls">
+      <button class="demo-btn" onclick="injectFrame('cat')" title="Good animal — resets counter">🐱 Good (cat)</button>
+      <button class="demo-btn" onclick="injectFrame('opossum')" title="Bad animal — counts toward threshold">🦝 Bad (opossum)</button>
+      <button class="demo-btn" onclick="injectFrame('none')" title="No animal — resets counter">⬜ No Animal</button>
+      <button class="demo-btn active" onclick="resetDemo()" title="Clear everything">🔄 Reset</button>
+    </div>
+  </div>
+
+
+  <!-- ═══════════ SUMMARY CARDS ═══════════ -->
+  <div class="summary-grid">
+    <div class="summary-card">
+      <h4>⏱ Timing</h4>
+      <p>Webcam captures every ~1 second. Diff-gate skips Ollama when scene is static. Forced fresh check runs every 30 seconds regardless of diff score.</p>
+    </div>
+    <div class="summary-card">
+      <h4>🛡️ False-Positive Protection</h4>
+      <p>A single bad detection never closes the gate. Consensus requires 3 consecutive "bad" votes (~3 seconds) before any arm action is triggered.</p>
+    </div>
+    <div class="summary-card">
+      <h4>🔒 Stay-Closed Policy</h4>
+      <p>After closure, the gate holds for a minimum of 60 seconds AND requires 3 consecutive clear frames. Prevents an animal from "testing" the gate repeatedly.</p>
+    </div>
+    <div class="summary-card">
+      <h4>🤖 AI Model</h4>
+      <p>A fine-tuned qwen2.5vl vision model running locally via Ollama, receiving base64-encoded frames plus a structured classification prompt.</p>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+// ─── Interactive Demo Logic ───
+
+const BAD_THRESHOLD = 3;
+const HOLD_MIN_SECONDS = 60;
+const HOLD_CLEAR_LOOPS = 3;
+
+let state = {
+  buffer: [],       // array of 'cat'|'dog'|'opossum'|'ferret'|'none'
+  armState: 'open', // 'open'|'closed'
+  closedSince: null,
+  lastBadDetection: null,
+  clearLoops: 0,
+};
+
+let demoRunning = false;
+let demoTimer = null;
+
+function getBadge(name) {
+  const good = ['cat','dog'];
+  return good.includes(name.toLowerCase()) ? 'good' : (name.toLowerCase() === 'none' ? '' : 'bad');
+}
+
+function renderDemoChips() {
+  const row = document.getElementById('demoVoteRow2');
+  if (!row) return;
+  // Show the last BAD_THRESHOLD slots plus one more to show "in progress"
+  const totalSlots = Math.max(BAD_THRESHOLD + 1, state.buffer.length);
+  let html = '';
+  for (let i = Math.max(0, totalSlots - BAD_THRESHOLD); i < totalSlots; i++) {
+    const val = state.buffer[i];
+    if (val !== undefined) {
+      const cls = getBadge(val);
+      html += `<div class="vote-chip ${cls || 'good'}">${val}</div>`;
+    } else {
+      html += `<div class="vote-chip" style="opacity:.25">—</div>`;
+    }
+  }
+  if (state.armState === 'closed') {
+    const remaining = Math.max(0, HOLD_MIN_SECONDS - Math.floor((Date.now() - state.closedSince) / 1000));
+    html += `<span class="vote-remaining" style="margin-left:10px;color:var(--warning);">🔒 ${remaining}s hold</span>`;
+  } else {
+    const badVotes = state.buffer.filter(v => ['opossum','ferret'].includes(v?.toLowerCase())).slice(-BAD_THRESHOLD);
+    html += `<span class="vote-remaining" style="margin-left:10px;">${badVotes.length} / ${BAD_THRESHOLD} bad</span>`;
+  }
+  row.innerHTML = html;
+
+  const armEl = document.getElementById('armStatus');
+  if (state.armState === 'closed') {
+    armEl.innerHTML = `State: <span style="color:var(--danger);">CLOSED 🔒</span>`;
+  } else {
+    armEl.innerHTML = `State: <span style="color:var(--accent);">OPEN ✅</span>`;
+  }
+}
+
+function addLog(html) {
+  const log = document.getElementById('demoLog');
+  if (!log) return;
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function processFrame(animal) {
+  state.buffer.push(animal);
+  // Keep buffer bounded
+  if (state.buffer.length > 20) state.buffer.shift();
+
+  const badge = getBadge(animal);
+  const timeStr = new Date().toLocaleTimeString();
+
+  addLog(`<span class="line-new">[${timeStr}] Frame → ${animal}</span>`);
+
+  // Check arm closure
+  if (state.armState === 'open') {
+    const recentBad = state.buffer.slice(-BAD_THRESHOLD);
+    const allBad = recentBad.every(v => ['opossum','ferret'].includes(v?.toLowerCase()));
+    if (allBad) {
+      state.armState = 'closed';
+      state.closedSince = Date.now();
+      addLog(`<span class="line-confirm">🔒 CONFIRMED: ${BAD_THRESHOLD} consecutive bad detections — closing arm!</span>`);
+    } else {
+      const badCount = recentBad.filter(v => ['opossum','ferret'].includes(v?.toLowerCase())).length;
+      if (badCount > 0) {
+        addLog(`<span class="line-bad">📊 Bad votes: ${badCount}/${BAD_THRESHOLD} — gate still open</span>`);
+      } else {
+        addLog(`<span class="line-good">✅ No threat detected</span>`);
+      }
+    }
+  }
+
+  // Check arm release (only when closed)
+  if (state.armState === 'closed') {
+    const timeSinceBad = Math.floor((Date.now() - state.lastBadDetection) / 1000);
+    const recentGood = state.buffer.slice(-HOLD_CLEAR_LOOPS);
+    const allClear = recentGood.every(v => v && !['opossum','ferret'].includes(v.toLowerCase()));
+
+    // Simulate time passing for demo purposes — auto-advance "lastBadDetection" so condition 2 can be met faster
+    // In real code, state.lastBadDetection is set by DetectionEngine and never back-dated.
+    // Here we compress it: once buffer has cleared, the timer starts counting.
+    let condition1 = recentGood.length >= HOLD_CLEAR_LOOPS && allClear;
+    let condition2 = (Date.now() - state.closedSince) / 1000 >= HOLD_MIN_SECONDS;
+
+    if (condition1 && condition2) {
+      addLog(`<span class="line-release">🔓 RELEASED: Both conditions met — reopening arm!</span>`);
+      state.armState = 'open';
+      state.buffer = [];
+      renderDemoChips();
+      return;
+    }
+
+    // For demo: show progress
+    if (condition1 && !condition2) {
+      const remaining = Math.max(0, HOLD_MIN_SECONDS - Math.floor((Date.now() - state.closedSince) / 1000));
+      addLog(`<span class="line-info">Condition 1 ✅ met · Condition 2 ⏳ ${remaining}s remaining</span>`);
+    }
+  }
+
+  // Track last bad detection time
+  if (['opossum','ferret'].includes(animal.toLowerCase())) {
+    state.lastBadDetection = Date.now();
+  }
+
+  renderDemoChips();
+}
+
+function injectFrame(animal) {
+  addLog(`<span class="line-motion">▶ Frame: ${animal}</span>`);
+  processFrame(animal);
+}
+
+function resetDemo() {
+  state = { buffer:[], armState:'open', closedSince:null, lastBadDetection:null, clearLoops:0 };
+  const log = document.getElementById('demoLog');
+  if (log) log.innerHTML = '<div class="line-info">// demo reset — click buttons to simulate frames</div>';
+  renderDemoChips();
+}
+
+// Initialize
+renderDemoChips();
+addLog('<span class="line-info">// Pipeline idle — click buttons above to simulate detection events</span>');
+</script>
+
+</body>
+</html>

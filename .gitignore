@@ -1,0 +1,58 @@
+# ─── Build output (.NET) — any depth ───
+**/bin/
+**/obj/
+*.user
+*.suo
+.vs/
+
+# ─── Python cache (any depth) ───
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/.pytest_cache/
+**/*.egg-info/
+
+# ─── Compiled binaries & DLLs (any file anywhere) ───
+*.exe
+*.dll
+*.pdb
+*.so
+*.dylib
+*.minidmp
+*.deps.json
+*.runtimeconfig.json
+
+# ─── Runtime / temp files created by the application ───
+state.txt
+temp.jpg
+last_no_animal.jpg
+last_detection_state.txt
+last_ollama_call.txt
+
+# ─── Config with secrets/paths (if present at repo root) ───
+system.json
+animals.json
+config.json
+state.json
+
+# ─── Video/media files ───
+*.mp4
+*.MOV
+*.avi
+*.mkv
+
+# ─── IDE & OS artifacts ───
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+$RECYCLE.BIN/
+
+# ─── GSD planning dirs (any depth) ───
+**/.planning/
+
+# ─── Claude Code worktrees (ephemeral — never commit) ───
+**/.claude/worktrees/
+**.claude/scheduled_tasks.lock
+
+# ─── STL files (uncomment to exclude large binary mesh files) ───
+# *.stl

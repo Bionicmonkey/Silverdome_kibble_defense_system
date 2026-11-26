@@ -1,0 +1,7 @@
+[project]
+name = "MonitorApp"
+version = "0.1.0"
+description = "Feeder dashboard for AnimalDetector"
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
