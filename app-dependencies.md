@@ -11,7 +11,7 @@ Exhaustive list of tools, frameworks, SDKs, hardware, and materials required to 
 | **Windows 10/11** (x64) | — | Host OS for all software and hardware | All projects target `win-x64` runtime identifier |
 | **.NET 10.0 SDK** | net10.0 | Compile target for all C# projects | Required to build `newdetector`, `ollama-batcher`, `MoveArm` |
 | **.NET 10.0 Runtime** (ASP.NET Core) | net10.0 | Host the MonitorAppweb Flask app? No — Python only. But .NET runtime needed for all C# apps at deploy time | Framework-dependent deploy (`<SelfContained>false</SelfContained>`); the target machine needs the ASP.NET Core runtime bundle installed |
-| **Ollama** | latest stable | Local LLM inference server (vision model) | Runs on `http://127.0.0.1:11434`. Both `qwen3.5:4b` and `qwen3.6:35b` models need to be pulled into the local Ollama library |
+| **Ollama** | latest stable | Local LLM inference server (vision model) | Runs on `http://127.0.0.1:11434`. Three model states are used across the project lifecycle — see section 5. |
 
 ---
 
@@ -81,7 +81,8 @@ These are external binaries expected to be on the system PATH at runtime:
 | Model | Size | Type | Purpose | Used By |
 |-------|------|------|---------|---------|
 | **qwen3.5:4b** | ~4B params | Vision (Qwen series) | Default model for both `newdetector` and `ollama-batcher` (per `system.json` default + batch help text) | All detection |
-| **qwen3.6:35b** | ~35B params | Vision (Qwen series, upgraded) | Listed in `ollama-batcher` help as an example model; target for future upgrade from 4B → 35B for better classification accuracy | Future target |
+| **qwen2.5vl** | ~7B params | Vision (Qwen series) | Interim upgrade from qwen3.5:4b — better image understanding; pull and test before committing to fine-tuning path | Interim state |
+| **qwen2.5vl (fine-tuned)** | custom | Vision (custom) | Optimal state — your own fine-tuned version trained on your image library for high-accuracy classification. Trained offline, pulled into Ollama as a custom model. | Target |
 
 **Pull command:**
 ```bash
