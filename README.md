@@ -12,6 +12,26 @@ If you are interested in contributing, please do reach out to connect.
 
 IMPORTANT LICENSING NOTE - see the PolyForm NonCommercial License document in this repo which explains the NON-COMMERCIAL license granted to use this software and design.
 
+## The Three Pillars
+
+The system is built from three interconnected parts — hardware, vision, and computation:
+
+### 1. 3D-Printed Feeder Machine
+
+A self-contained motorized gate mechanism printed in parts and assembled on a benchtop extrusion printer. A NEMA 17 stepper motor drives a worm gear that rotates a gate arm between open and closed positions, controlled over USB by a Pololu TIC500 stepper driver. The housing encloses the electronics, protects against weather, and routes kibble from a food cup through the gate opening.
+
+![Full assembly](FeederMachine/Images/"Machine Design.jpg")
+
+### 2. Webcam — the Eye
+
+A standard DirectShow webcam (MJPG codec) captures frames at approximately 1-second intervals. The capture loop grabs 5 consecutive frames and selects the one with the highest contrast — filtering out motion blur from quick-moving animals. Each frame feeds through an image-diff gate: if the scene hasn't changed more than ~10%, Ollama is skipped entirely, saving inference time.
+
+### 3. Host Computer — the Brain
+
+A always-on PC connected to both the webcam and the TIC500 controller via USB/serial. It runs `newdetector` (the core detection daemon), `MonitorAppweb` (a Flask dashboard for monitoring), and communicates with Ollama for vision-based animal classification via a local LLM. Designed to be migratable to a Raspberry Pi 5 with on-device inference down the line.
+
+![Screw / gear mechanism close-up](FeederMachine/Images/"screw mechanism.jpg")
+
 ## Projects in this Repository
 
 Located at `C:\AnimalDetectorRoot\` — six distinct sub-projects:
