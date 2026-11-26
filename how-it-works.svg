@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 1850" font-family="Segoe UI, system-ui, -apple-system, sans-serif">
+
+<!-- ════════ DEFS ════════ -->
+<defs>
+  <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#0f1117"/>
+    <stop offset="100%" stop-color="#0f1117"/>
+  </linearGradient>
+  <linearGradient id="grad-accent" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#6ee7b7"/>
+    <stop offset="100%" stop-color="#7dd3fc"/>
+  </linearGradient>
+  <!-- Color-coded badges -->
+  <style>
+    .title { font-size:28px; font-weight:700; fill:url(#grad-accent); text-anchor:middle; }
+    .subtitle { font-size:13px; fill:#8b90a0; text-anchor:middle; }
+    .badge-text { font-size:10px; font-weight:700; text-anchor:middle; letter-spacing:0.5px; }
+    .heading { font-size:18px; font-weight:600; fill:#d8dae0; }
+    .body-text { font-size:12px; fill:#8b90a0; line-height:1.5; }
+    .small-label { font-size:9px; fill:#8b90a0; }
+    .divider { stroke:#2e3345; stroke-width:1; }
+  </style>
+</defs>
+
+<!-- ════════ BACKGROUND ════════ -->
+<rect width="960" height="1850" fill="url(#bg)"/>
+
+<!-- ════════ TITLE ════════ -->
+<text x="480" y="42" class="title">Silverdome — How It Works</text>
+<text x="480" y="68" class="subtitle">The full detection pipeline: from webcam frame to consensus-driven arm actuation</text>
+<line x1="280" y1="85" x2="680" y2="85" class="divider"/>
+
+<!-- ════════ STEP 1: Capture ════════ -->
+<rect x="40" y="95" width="880" height="155" rx="12" fill="#1a1d27" stroke="#6ee7b725" stroke-width="1"/>
+<line x1="40" y1="95" x2="40" y2="250" stroke="#6ee7b7" stroke-width="3"/>
+
+<!-- Badge -->
+<rect x="60" y="110" width="108" height="26" rx="6" fill="#6ee7b718"/>
+<text x="114" y="128" class="badge-text" fill="#6ee7b7">STEP 1 — CAPTURE</text>
+
+<!-- Title & description -->
+<text x="60" y="158" class="heading">Webcam Frame Every ~1 Second</text>
+<text x="60" y="182" class="body-text">The webcam opens once via DirectShow and captures a live frame every second.</text>
+<text x="60" y="200" class="body-text">Each frame is saved as temp.jpg in the working directory — shared with</text>
+<text x="60" y="218" class="body-text">MonitorAppweb for the live dashboard snapshot.</text>
+
+<!-- Camera icon -->
+<g transform="translate(640, 105)">
+  <rect width="70" height="50" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+  <circle cx="35" cy="30" r="12" fill="#1e3a5f" stroke="#475569" stroke-width="1.5"/>
+  <circle cx="35" cy="30" r="7" fill="#2563eb" opacity="0.4"/>
+  <text x="35" y="70" text-anchor="middle" class="small-label">Camera</text>
+</g>
+
+<!-- Arrow to temp.jpg -->
+<path d="M720 130 L750 130" stroke="#6ee7b7" stroke-width="1.5"/>
+<polygon points="750,126 758,130 750,134" fill="#6ee7b7"/>
+
+<g transform="translate(765, 105)">
+  <rect width="90" height="50" rx="6" fill="#232733" stroke="#2e3345" stroke-width="1"/>
+  <text x="45" y="28" text-anchor="middle" font-size="11" font-weight="600" fill="#d8dae0">temp.jpg</text>
+  <text x="45" y="44" text-anchor="middle" class="small-label">saved to disk</text>
+</g>
+
+<!-- Timer -->
+<text x="830" y="125" text-anchor="middle" font-size="16" fill="#6ee7b7">&#x23F1;</text>
+<text x="830" y="140" text-anchor="middle" class="small-label">1s</text>
+
+<!-- ════════ CONNECTOR ARROW ════════ -->
+<path d="M480 250 L480 278" stroke="#2e3345" stroke-width="2"/>
+<polygon points="480,274 476,282 484,282" fill="#2e3345"/>
+
+<!-- ════════ STEP 2: Motion Detection ════════ -->
+<rect x="40" y="288" width="880" height="125" rx="12" fill="#1a1d27" stroke="#7dd3fc25" stroke-width="1"/>
+<line x1="40" y1="288" x2="40" y2="413" stroke="#7dd3fc" stroke-width="3"/>
+
+<rect x="60" y="303" width="118" height="26" rx="6" fill="#7dd3fc18"/>
+<text x="119" y="321" class="badge-text" fill="#7dd3fc">STEP 2 — MOTION GATE</text>
+
+<text x="60" y="355" class="heading">Difference Check (Diff-Gate)</text>
+<text x="60" y="378" class="body-text">Compares current frame against last "no animal" baseline using pixel-level RGB delta.</text>
+<text x="60" y="396" class="body-text">Only when pixels change beyond ~10% threshold does it proceed to inference.</text>
+
+<!-- Grid visualization -->
+<g transform="translate(520, 300)">
+  <!-- Baseline grid -->
+  <rect width="65" height="78" rx="6" fill="#232733"/>
+  <text x="32" y="14" text-anchor="middle" class="small-label">Baseline</text>
+  <g>
+    <!-- 4x4 grid cells -->
+    <rect x="8" y="22" width="13" height="13" rx="2" fill="#2a3441"/>
+    <rect x="23" y="22" width="13" height="13" rx="2" fill="#2a3441"/>
+    <rect x="38" y="22" width="13" height="13" rx="2" fill="#2a3441"/>
+    <rect x="53" y="22" width="13" height="13" rx="2" fill="#2a3441"/>
+    <rect x="8" y="37" width="13" height="13" rx="2" fill="#2a3441"/>
+    <rect x="23" y="37" width="13" height="13" rx="2" fill="#2a3441"/>
+    <rect x="38" y="37" width="13" height="13" rx="2" fill="#2a3441"/>
+    <rect x="53" y="37" width="13" height="13" rx="2" fill="#2a3441"/>
+    <rect x="8" y="52" width="13" height="13" rx="2" fill="#2a3441"/>
+    <rect x="23" y="52" width="13" height="13" rx="2" fill="#2a3441"/>
+    <rect x="38" y="52" width="13" height="13" rx="2" fill="#2a3441"/>
+    <rect x="53" y="52" width="13" height="13" rx="2" fill="#2a3441"/>
+  </g>
+
+  <!-- Arrow between grids -->
+  <text x="80" y="66" text-anchor="middle" font-size="16" fill="#8b90a0">&#x2192;</text>
+
+  <!-- Current frame grid (some cells changed) -->
+  <rect x="95" width="65" height="78" rx="6" fill="#232733"/>
+  <text x="127" y="14" text-anchor="middle" class="small-label">Current</text>
+  <g>
+    <rect x="103" y="22" width="13" height="13" rx="2" fill="#2a3441"/>
+    <rect x="118" y="22" width="13" height="13" rx="2" fill="#f87171"/> <!-- changed -->
+    <rect x="133" y="22" width="13" height="13" rx="2" fill="#2a3441"/>
+    <rect x="148" y="22" width="13" height="13" rx="2" fill="#f87171"/> <!-- changed -->
+    <rect x="103" y="37" width="13" height="13" rx="2" fill="#2a3441"/>
+    <rect x="118" y="37" width="13" height="13" rx="2" fill="#f87171"/> <!-- changed -->
+    <rect x="133" y="37" width="13" height="13" rx="2" fill="#2a3441"/>
+    <rect x="148" y="37" width="13" height="13" rx="2" fill="#2a3441"/>
+    <rect x="103" y="52" width="13" height="13" rx="2" fill="#f87171"/> <!-- changed -->
+    <rect x="118" y="52" width="13" height="13" rx="2" fill="#2a3441"/>
+    <rect x="133" y="52" width="13" height="13" rx="2" fill="#f87171"/> <!-- changed -->
+    <rect x="148" y="52" width="13" height="13" rx="2" fill="#2a3441"/>
+  </g>
+
+  <!-- Threshold label -->
+  <rect x="190" y="6" width="100" height="22" rx="4" fill="#f8717120"/>
+  <text x="240" y="21" text-anchor="middle" font-size="9" font-weight="600" fill="#f87171">&gt;10%?</text>
+</g>
+
+<!-- ════════ CONNECTOR ARROW ════════ -->
+<path d="M480 413 L480 440" stroke="#2e3345" stroke-width="2"/>
+<polygon points="480,436 476,444 484,444" fill="#2e3345"/>
+
+<!-- ════════ STEP 3: AI Inference ════════ -->
+<rect x="40" y="450" width="880" height="110" rx="12" fill="#1a1d27" stroke="#c4b5fd25" stroke-width="1"/>
+<line x1="40" y1="450" x2="40" y2="560" stroke="#c4b5fd" stroke-width="3"/>
+
+<rect x="60" y="465" width="128" height="26" rx="6" fill="#c4b5fd18"/>
+<text x="124" y="483" class="badge-text" fill="#c4b5fd">STEP 3 — VISION INFERENCE</text>
+
+<text x="60" y="515" class="heading">qwen2.5vl Model Analysis</text>
+<text x="60" y="538" class="body-text">Frame is resized, base64-encoded, and sent to a local Ollama instance for animal classification.</text>
+
+<!-- Model card -->
+<g transform="translate(680, 465)">
+  <rect width="190" height="78" rx="10" fill="#4c1d9512" stroke="#7c3aed35" stroke-width="1"/>
+  <text x="95" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#c4b5fd">qwen2.5vl</text>
+  <text x="95" y="40" text-anchor="middle" class="small-label">Fine-tuned vision model</text>
+  <!-- Endpoint -->
+  <rect x="20" y="48" width="150" height="20" rx="4" fill="#1a1d27" stroke="#2e3345" stroke-width="0.5"/>
+  <text x="95" y="62" text-anchor="middle" font-size="9" fill="#6ee7b7">127.0.0.1:11434/api/chat</text>
+</g>
+
+<!-- Input icon -->
+<g transform="translate(600, 475)">
+  <rect width="65" height="55" rx="8" fill="#232733" stroke="#2e3345" stroke-width="1"/>
+  <text x="32" y="24" text-anchor="middle" class="small-label">Frame JPEG</text>
+  <!-- Arrow from frame to model -->
+  <path d="M65 28 L78 28" stroke="#c4b5fd" stroke-width="1.2"/>
+  <polygon points="78,24 84,28 78,32" fill="#c4b5fd"/>
+</g>
+
+<!-- ════════ CONNECTOR ARROW ════════ -->
+<path d="M480 560 L480 588" stroke="#2e3345" stroke-width="2"/>
+<polygon points="480,584 476,592 484,592" fill="#2e3345"/>
+
+<!-- ════════ STEP 4: Consensus Loop ════════ -->
+<rect x="40" y="598" width="880" height="135" rx="12" fill="#1a1d27" stroke="#fb923c25" stroke-width="1"/>
+<line x1="40" y1="598" x2="40" y2="733" stroke="#fb923c" stroke-width="3"/>
+
+<rect x="60" y="613" width="140" height="26" rx="6" fill="#fb923c18"/>
+<text x="130" y="631" class="badge-text" fill="#fb923c">STEP 4 — CONSENSUS BUFFER</text>
+
+<text x="60" y="665" class="heading">Anti-Spam Protection</text>
+<text x="60" y="688" class="body-text">A single "bad animal" detection does NOT close the gate.</text>
+<text x="60" y="706" class="body-text">Requires 3 consecutive bad-animal votes (~3 seconds) before action.</text>
+
+<!-- Vote chips visualization -->
+<g transform="translate(540, 618)">
+  <rect width="310" height="92" rx="8" fill="#232733"/>
+  <text x="155" y="18" text-anchor="middle" font-size="10" font-weight="600" fill="#8b90a0">Consensus Buffer (rolling window)</text>
+
+  <!-- green chips -->
+  <rect x="20" y="32" width="42" height="34" rx="6" fill="#6ee7b715" stroke="#6ee7b740" stroke-width="1"/>
+  <text x="41" y="54" text-anchor="middle" font-size="11" font-weight="700" fill="#6ee7b7">cat</text>
+
+  <rect x="68" y="32" width="42" height="34" rx="6" fill="#6ee7b715" stroke="#6ee7b740" stroke-width="1"/>
+  <text x="89" y="54" text-anchor="middle" font-size="11" font-weight="700" fill="#6ee7b7">cat</text>
+
+  <!-- red chip -->
+  <rect x="116" y="32" width="42" height="34" rx="6" fill="#f8717115" stroke="#f8717140" stroke-width="1"/>
+  <text x="137" y="54" text-anchor="middle" font-size="11" font-weight="700" fill="#f87171">&#x1F99D;</text>
+
+  <!-- empty slots -->
+  <rect x="164" y="32" width="42" height="34" rx="6" fill="#1a1d27" stroke="#2e3345" stroke-width="1"/>
+  <text x="185" y="54" text-anchor="middle" font-size="14" fill="#5a5f6e">-</text>
+
+  <rect x="212" y="32" width="42" height="34" rx="6" fill="#1a1d27" stroke="#2e3345" stroke-width="1"/>
+  <text x="233" y="54" text-anchor="middle" font-size="14" fill="#5a5f6e">-</text>
+
+  <!-- Count indicator -->
+  <rect x="270" y="30" width="28" height="38" rx="4" fill="#fbbf2415"/>
+  <text x="284" y="54" text-anchor="middle" font-size="12" font-weight="700" fill="#fbbf24">1/3</text>
+
+  <!-- Threshold line -->
+  <line x1="160" y1="68" x2="160" y2="58" stroke="#2e3345" stroke-width="0.5"/>
+  <text x="284" y="78" text-anchor="middle" font-size="9" fill="#8b90a0">threshold</text>
+</g>
+
+<!-- ════════ CONNECTOR ARROW ════════ -->
+<path d="M480 733 L480 760" stroke="#2e3345" stroke-width="2"/>
+<polygon points="480,756 476,764 484,764" fill="#2e3345"/>
+
+<!-- ════════ STEP 5: Decision Gate ════════ -->
+<rect x="40" y="770" width="880" height="120" rx="12" fill="#1a1d27" stroke="#fbbf2425" stroke-width="1"/>
+<line x1="40" y1="770" x2="40" y2="890" stroke="#fbbf24" stroke-width="3"/>
+
+<rect x="60" y="785" width="128" height="26" rx="6" fill="#fbbf2418"/>
+<text x="124" y="803" class="badge-text" fill="#fbbf24">STEP 5 — DECISION GATE</text>
+
+<text x="60" y="835" class="heading">Confidence Threshold Check</text>
+<text x="60" y="858" class="body-text">3 consecutive bad votes triggers confirmation.</text>
+<text x="60" y="876" class="body-text">Good-vote resets the counter — no false closures.</text>
+
+<!-- Decision diamond -->
+<g transform="translate(520, 785)">
+  <!-- Diamond shape -->
+  <polygon points="80,4 130,35 80,66 30,35" fill="#232733" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="80" y="26" text-anchor="middle" font-size="9" font-weight="600" fill="#fbbf24">&#x2265;</text>
+  <text x="80" y="39" text-anchor="middle" font-size="8" fill="#8b90a0">3 bad?</text>
+
+  <!-- YES branch -->
+  <line x1="130" y1="35" x2="170" y2="35" stroke="#f87171" stroke-width="1.5"/>
+  <polygon points="170,30 178,35 170,40" fill="#f87171"/>
+  <rect x="185" y="15" width="82" height="40" rx="6" fill="#f8717115" stroke="#f8717135" stroke-width="1"/>
+  <text x="226" y="34" text-anchor="middle" font-size="10" font-weight="600" fill="#f87171">&#x2713; YES</text>
+  <text x="226" y="48" text-anchor="middle" font-size="9" fill="#8b90a0">Close arm</text>
+
+  <!-- NO branch -->
+  <line x1="-30" y1="35" x2="-70" y2="35" stroke="#6ee7b7" stroke-width="1.5"/>
+  <polygon points="-70,30 -78,35 -70,40" fill="#6ee7b7"/>
+  <rect x="-152" y="15" width="70" height="40" rx="6" fill="#6ee7b710" stroke="#6ee7b730" stroke-width="1"/>
+  <text x="-117" y="34" text-anchor="middle" font-size="10" font-weight="600" fill="#6ee7b7">&#x2717; NO</text>
+  <text x="-117" y="48" text-anchor="middle" font-size="9" fill="#8b90a0">Keep watching</text>
+</g>
+
+<!-- ════════ CONNECTOR ARROW ════════ -->
+<path d="M480 890 L480 916" stroke="#2e3345" stroke-width="2"/>
+<polygon points="480,912 476,920 484,920" fill="#2e3345"/>
+
+<!-- ════════ STEP 6: Arm Closure ════════ -->
+<rect x="40" y="926" width="880" height="110" rx="12" fill="#1a1d27" stroke="#f8717125" stroke-width="1"/>
+<line x1="40" y1="926" x2="40" y2="1036" stroke="#f87171" stroke-width="3"/>
+
+<rect x="60" y="941" width="120" height="26" rx="6" fill="#f8717118"/>
+<text x="120" y="959" class="badge-text" fill="#f87171">STEP 6 — ARM CLOSURE</text>
+
+<text x="60" y="990" class="heading">Actuator Command via Pololu TIC500</text>
+<text x="60" y="1013" class="body-text">Energize motor &#x2192; drive to closed position &#x2192; wait 15s &#x2192; de-energize. Persists state to state.txt.</text>
+
+<!-- State transition -->
+<g transform="translate(600, 948)">
+  <rect width="110" height="38" rx="6" fill="#6ee7b715" stroke="#6ee7b735" stroke-width="1"/>
+  <text x="55" y="24" text-anchor="middle" font-size="11" font-weight="600" fill="#6ee7b7">&#x1F7E2; Open</text>
+
+  <text x="140" y="23" font-size="14" fill="#f87171">&#x2192;</text>
+  <text x="155" y="23" font-size="14" fill="#f87171">&#x2192;</text>
+  <text x="170" y="23" font-size="14" fill="#f87171">&#x2192;</text>
+
+  <rect x="190" width="115" height="38" rx="6" fill="#f8717115" stroke="#f8717135" stroke-width="1"/>
+  <text x="247" y="24" text-anchor="middle" font-size="11" font-weight="600" fill="#f87171">&#x1F534; Closed</text>
+
+  <!-- ticcmd label -->
+  <rect x="210" y="44" width="90" height="18" rx="4" fill="#232733"/>
+  <text x="255" y="57" text-anchor="middle" font-size="8" fill="#8b90a0">ticcmd --position 0</text>
+</g>
+
+<!-- ════════ CONNECTOR ARROW ════════ -->
+<path d="M480 1036 L480 1062" stroke="#2e3345" stroke-width="2"/>
+<polygon points="480,1058 476,1066 484,1066" fill="#2e3345"/>
+
+<!-- ════════ STEP 7: Hold & Release ════════ -->
+<rect x="40" y="1072" width="880" height="145" rx="12" fill="#1a1d27" stroke="#6ee7b725" stroke-width="1"/>
+<line x1="40" y1="1072" x2="40" y2="1217" stroke="#6ee7b7" stroke-width="3"/>
+
+<rect x="60" y="1087" width="150" height="26" rx="6" fill="#6ee7b718"/>
+<text x="135" y="1105" class="badge-text" fill="#6ee7b7">STEP 7 — HOLD &amp; RELEASE</text>
+
+<text x="60" y="1137" class="heading">Double-Guard Release Policy</text>
+<text x="60" y="1160" class="body-text">Gate stays closed even after the animal leaves. Reopens only when BOTH conditions are met:</text>
+
+<!-- Condition cards -->
+<g transform="translate(500, 1087)">
+  <rect width="340" height="112" rx="10" fill="#232733"/>
+
+  <!-- Condition 1 card -->
+  <rect x="12" y="16" width="155" height="78" rx="8" fill="#6ee7b712" stroke="#6ee7b730" stroke-width="1"/>
+  <text x="89" y="34" text-anchor="middle" font-size="9" font-weight="600" fill="#6ee7b7">CONDITION 1</text>
+  <text x="89" y="52" text-anchor="middle" class="small-label" fill="#d8dae0">No bad animal detection</text>
+  <text x="89" y="64" text-anchor="middle" class="small-label" fill="#d8dae0">&times; 3 consecutive loops</text>
+  <text x="89" y="78" text-anchor="middle" font-size="12" font-weight="700" fill="#6ee7b7">~3 seconds</text>
+
+  <!-- AND symbol -->
+  <rect x="185" y="38" width="45" height="34" rx="4" fill="#fbbf2420"/>
+  <text x="207" y="60" text-anchor="middle" font-size="16" font-weight="700" fill="#fbbf24">&amp;</text>
+
+  <!-- Condition 2 card -->
+  <rect x="235" y="16" width="90" height="78" rx="8" fill="#fbbf2412" stroke="#fbbf2430" stroke-width="1"/>
+  <text x="280" y="34" text-anchor="middle" font-size="9" font-weight="600" fill="#fbbf24">CONDITION 2</text>
+  <text x="280" y="52" text-anchor="middle" class="small-label" fill="#d8dae0">&#x2265; 60s since</text>
+  <text x="280" y="64" text-anchor="middle" class="small-label" fill="#d8dae0">last bad detection</text>
+  <text x="280" y="78" text-anchor="middle" font-size="12" font-weight="700" fill="#fbbf24">&#x2265;60s</text>
+
+  <!-- Release arrow -->
+  <line x1="325" y1="55" x2="340" y2="55" stroke="#6ee7b7" stroke-width="1.5"/>
+  <polygon points="340,51 348,55 340,59" fill="#6ee7b7"/>
+
+  <!-- Open result -->
+  <rect x="350" y="32" width="72" height="46" rx="8" fill="#6ee7b718" stroke="#6ee7b740" stroke-width="1"/>
+  <text x="386" y="54" text-anchor="middle" font-size="14" font-weight="700" fill="#6ee7b7">&#x2705;</text>
+  <text x="386" y="68" text-anchor="middle" font-size="9" font-weight="600" fill="#d8dae0">Open</text>
+</g>
+
+<!-- ════════ MODEL PROGRESSION SECTION ════════ -->
+<line x1="280" y1="1235" x2="680" y2="1235" class="divider"/>
+<text x="480" y="1263" text-anchor="middle" font-size="16" font-weight="600" fill="#d8dae0">AI Model Progression</text>
+
+<!-- Three-stage flow -->
+<g transform="translate(180, 1285)">
+  <!-- Stage 1: Initial (current default) -->
+  <rect width="145" height="75" rx="10" fill="#6ee7b70d" stroke="#6ee7b730" stroke-width="1.5"/>
+  <text x="72" y="22" text-anchor="middle" font-size="9" font-weight="700" fill="#6ee7b7">STAGE 1 — INITIAL</text>
+  <text x="72" y="42" text-anchor="middle" font-size="18" font-weight="700" fill="#d8dae0">qwen3.5:4b</text>
+  <text x="72" y="60" text-anchor="middle" class="small-label" fill="#8b90a0">(current default)</text>
+
+  <!-- Arrow -->
+  <text x="165" y="46" font-size="18" fill="#8b90a0">&#x2192;</text>
+
+  <!-- Stage 2: Interim -->
+  <rect x="190" width="145" height="75" rx="10" fill="#c4b5fd0d" stroke="#c4b5fd30" stroke-width="1.5"/>
+  <text x="262" y="22" text-anchor="middle" font-size="9" font-weight="700" fill="#c4b5fd">STAGE 2 — INTERIM</text>
+  <text x="262" y="42" text-anchor="middle" font-size="18" font-weight="700" fill="#d8dae0">qwen2.5vl</text>
+  <text x="262" y="60" text-anchor="middle" class="small-label" fill="#8b90a0">(pull &amp; test)</text>
+
+  <!-- Arrow -->
+  <text x="355" y="46" font-size="18" fill="#8b90a0">&#x2192;</text>
+
+  <!-- Stage 3: Optimal (target) -->
+  <rect x="380" width="180" height="75" rx="10" fill="#fb923c0d" stroke="#fb923c30" stroke-width="1.5"/>
+  <text x="470" y="22" text-anchor="middle" font-size="9" font-weight="700" fill="#fb923c">STAGE 3 — OPTIMAL</text>
+  <text x="470" y="42" text-anchor="middle" font-size="18" font-weight="700" fill="#d8dae0">qwen2.5vl</text>
+  <text x="470" y="60" text-anchor="middle" class="small-label" fill="#8b90a0">(fine-tuned on your images)</text>
+</g>
+
+<!-- ════════ SUMMARY CARDS ════════ -->
+<line x1="280" y1="1385" x2="680" y2="1385" class="divider"/>
+<text x="480" y="1413" text-anchor="middle" font-size="16" font-weight="600" fill="#d8dae0">Key Design Principles</text>
+
+<!-- Four cards in a row -->
+<g transform="translate(120, 1440)">
+  <!-- Card 1: Timing -->
+  <rect width="175" height="95" rx="10" fill="#1a1d27" stroke="#2e3345" stroke-width="1"/>
+  <text x="87" y="24" text-anchor="middle" font-size="11" font-weight="600" fill="#6ee7b7">&#x23F1; Timing</text>
+  <line x1="25" y1="34" x2="150" y2="34" stroke="#2e3345" stroke-width="0.5"/>
+  <text x="87" y="52" text-anchor="middle" font-size="10" fill="#d8dae0">Webcam captures every</text>
+  <text x="87" y="66" text-anchor="middle" font-size="10" fill="#d8dae0">&gt;~1 second. Diff-gate skips</text>
+  <text x="87" y="80" text-anchor="middle" font-size="10" fill="#d8dae0">Ollama when scene is static.</text>
+</g>
+
+<g transform="translate(340, 1440)">
+  <!-- Card 2: False Positive -->
+  <rect width="175" height="95" rx="10" fill="#1a1d27" stroke="#2e3345" stroke-width="1"/>
+  <text x="87" y="24" text-anchor="middle" font-size="11" font-weight="600" fill="#fb923c">&#x1F6E1; Anti-Spam</text>
+  <line x1="25" y1="34" x2="150" y2="34" stroke="#2e3345" stroke-width="0.5"/>
+  <text x="87" y="52" text-anchor="middle" font-size="10" fill="#d8dae0">A single bad detection</text>
+  <text x="87" y="66" text-anchor="middle" font-size="10" fill="#d8dae0">never closes the gate.</text>
+  <text x="87" y="80" text-anchor="middle" font-size="10" fill="#d8dae0">Consensus requires 3</text>
+  <text x="87" y="92" text-anchor="middle" font-size="10" fill="#8b90a0">consecutive bad votes.</text>
+</g>
+
+<g transform="translate(560, 1440)">
+  <!-- Card 3: Stay Closed -->
+  <rect width="175" height="95" rx="10" fill="#1a1d27" stroke="#2e3345" stroke-width="1"/>
+  <text x="87" y="24" text-anchor="middle" font-size="11" font-weight="600" fill="#fbbf24">&#x1F512; Stay-Closed</text>
+  <line x1="25" y1="34" x2="150" y2="34" stroke="#2e3345" stroke-width="0.5"/>
+  <text x="87" y="52" text-anchor="middle" font-size="10" fill="#d8dae0">Gate holds for minimum</text>
+  <text x="87" y="66" text-anchor="middle" font-size="10" fill="#d8dae0">60s after closure, plus</text>
+  <text x="87" y="80" text-anchor="middle" font-size="10" fill="#d8dae0">3 clear frames. Prevents</text>
+  <text x="87" y="92" text-anchor="middle" font-size="10" fill="#8b90a0">rapid cycling.</text>
+</g>
+
+<g transform="translate(780, 1440)">
+  <!-- Card 4: AI Model -->
+  <rect width="150" height="95" rx="10" fill="#1a1d27" stroke="#2e3345" stroke-width="1"/>
+  <text x="75" y="24" text-anchor="middle" font-size="11" font-weight="600" fill="#c4b5fd">&#x1F916; AI Model</text>
+  <line x1="25" y1="34" x2="125" y2="34" stroke="#2e3345" stroke-width="0.5"/>
+  <text x="75" y="52" text-anchor="middle" font-size="10" fill="#d8dae0">Fine-tuned qwen2.5vl</text>
+  <text x="75" y="66" text-anchor="middle" font-size="10" fill="#d8dae0">running locally via Ollama,</text>
+  <text x="75" y="80" text-anchor="middle" font-size="10" fill="#d8dae0">receiving base64-encoded</text>
+  <text x="75" y="92" text-anchor="middle" font-size="10" fill="#8b90a0">frames + classification</text>
+</g>
+
+<!-- ════════ BOTTOM NOTE ════════ -->
+<line x1="280" y1="1560" x2="680" y2="1560" class="divider"/>
+<text x="480" y="1590" text-anchor="middle" font-size="12" fill="#d8dae0" font-weight="600">Purpose</text>
+<text x="480" y="1614" text-anchor="middle" font-size="11" fill="#8b90a0">Protects legitimate cat visitors from being spooked by false positives,</text>
+<text x="480" y="1632" text-anchor="middle" font-size="11" fill="#8b90a0">while maintaining a firm hold on the gate long enough for any bad animal to move away.</text>
+
+<!-- Interactive demo note -->
+<rect x="305" y="1660" width="350" height="42" rx="8" fill="#7dd3fc08" stroke="#7dd3fc18" stroke-width="1"/>
+<text x="480" y="1680" text-anchor="middle" font-size="11" font-weight="600" fill="#7dd3fc">&#x1F524; Interactive Version Available</text>
+<text x="480" y="1698" text-anchor="middle" font-size="10" fill="#8b90a0">Open how-it-works.html locally for a clickable demo of the consensus buffer</text>
+
+<!-- ════════ LEGEND ════════ -->
+<line x1="280" y1="1730" x2="680" y2="1730" class="divider"/>
+<text x="480" y="1758" text-anchor="middle" font-size="11" font-weight="600" fill="#d8dae0">Color Legend</text>
+
+<g transform="translate(200, 1775)">
+  <rect width="12" height="12" rx="3" fill="#6ee7b7"/>
+  <text x="18" y="11" class="small-label" fill="#8b90a0">Open / Good</text>
+
+  <rect x="110" width="12" height="12" rx="3" fill="#f87171"/>
+  <text x="126" y="11" class="small-label" fill="#8b90a0">Closed / Bad</text>
+
+  <rect x="220" width="12" height="12" rx="3" fill="#fbbf24"/>
+  <text x="236" y="11" class="small-label" fill="#8b90a0">Warning / Check</text>
+
+  <rect x="330" width="12" height="12" rx="3" fill="#c4b5fd"/>
+  <text x="346" y="11" class="small-label" fill="#8b90a0">AI / Vision</text>
+
+  <rect x="430" width="12" height="12" rx="3" fill="#fb923c"/>
+  <text x="446" y="11" class="small-label" fill="#8b90a0">Consensus</text>
+</g>
+
+<!-- Footer -->
+<text x="480" y="1755" text-anchor="middle" font-size="9" fill="#5a5f6e">Silverdome Kibble Defense System — detection pipeline documentation</text>
+
+</svg>
